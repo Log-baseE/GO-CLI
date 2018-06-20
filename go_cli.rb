@@ -9,15 +9,16 @@ require_relative 'lib/go_cli/driver'
 require_relative 'lib/go_cli/trip'
 require_relative 'lib/go_cli/user_session'
 require_relative 'lib/go_cli/app_session'
-require_relative 'lib/go_cli/cli.rb'
+require_relative 'lib/go_cli/cli'
 require 'optparse'
 require 'yaml'
 require 'digest'
 require 'date'
+require 'io/console'
+require 'base64'
 
-# options = {}
+options = {}
 
-# main_cli = Config::CLI.new
+# main_cli = GoCLI::CLI.new
 # main_cli.start(options)
-
-puts GoCLI::Trip.new("aaa","asd",1,2,3,4)
+t =  GoCLI::Trip.create("asdfasdf", "aasd", 1,2,3,4)

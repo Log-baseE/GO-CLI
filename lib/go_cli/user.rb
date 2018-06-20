@@ -9,45 +9,67 @@ module GoCLI
       - May only contain alphanumerics, underscore (_) and hyphens(-)
     DESC
 
-    attr_reader :username, :password_digest, :debt
-  
+    attr_reader :user_id, :username, :password_digest, :debt, :filename
+
+    def self.generate_id(username)
+      Digest::SHA1.hexdigest(username)
+    end
+
     def self.generate_filename(username)
-      Config::USER_DATA_DIR + "#{username}.yml"
+      user_id = User.generate_id(username)
+      Config::USER_DATA_DIR + "#{user_id}.yml"
     end
 
     def self.exist?(username)
-      filename = username + ".yml"
-      Utils.load_file(User.generate_filename(username)) ? true : false rescue false
+      user_file_map = Utils.load_yml_file(Config::USER_FILE_MAPFILE)
+      user_file_map[username] ? true : false rescue false
     end
     
     def self.valid_username?(string)
-      User::PATTERN.match? username
+      User::USERNAME_PATTERN.match? string
     end
 
     def self.valid?(username, password)
+      return false unless User.exist?(username)
       user = load_user_file(User.generate_filename(username))
       user.password_digest == Digest::SHA2.hexdigest(password) rescue false
+    end
+
+    def self.load_data(username, password)
+      return nil unless User.valid?(username, password)
+      user_file_map = Utils.load_yml_file(Config::USER_FILE_MAPFILE)
+      filename = user_file_map[username]
+      User.load_user_file(filename)
     end
 
     def self.load_user_file(filename)
       user = Utils.load_file(filename)
       begin
-        User.new(user.username, user.password_digest, user.debt)
+        User.new(user.user_id, user.username, user.filename, user.password_digest, user.debt)
       rescue
         raise BadFileError, filename
       end
     end
 
     def self.signup(username, password)
-      user = User.new(username, Digest::SHA2.hexdigest(password), 0)
-      filename = generate_filename(username)
-      File.new(filename)
-      File.write(filename, YAML.dump(user))
+      user_id = User.generate_id(username)
+      filename = User.generate_filename(username)
+      user = User.new(user_id, username, filename, Digest::SHA2.hexdigest(password), 0)
+
+      Utils.write_file(user, filename)
+      user_id_map = Utils.load_yml_file(Config::USER_ID_MAPFILE)
+      user_id_map[username] = user_id
+      Utils.write_yml_file(user_id_map, Config::USER_ID_MAPFILE)
+      user_file_map = Utils.load_yml_file(Config::USER_FILE_MAPFILE)
+      user_file_map[username] = filename
+      Utils.write_yml_file(user_file_map, Config::USER_FILE_MAPFILE)
       user
     end
 
-    def initialize(username, password_digest, debt)
+    def initialize(user_id, username, filename, password_digest, debt)
+      @user_id = user_id
       @username = username
+      @filename = filename
       @password_digest = password_digest
       @debt = 0
     end
@@ -56,6 +78,8 @@ module GoCLI
       @debt += amount
     end
 
-    private_class_method :generate_filename
+    def to_s
+      puts @password_digest
+    end
   end
 end

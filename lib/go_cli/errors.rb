@@ -1,5 +1,5 @@
 module GoCLI
-  class BadFileError < StandardError
+  class BadFileError < RuntimeError
     def initialize(filename=nil)
       message = "ERRNO: #{ERR::BAD_FILE} - Bad file"
       message += ": #{filename}" if filename
@@ -15,15 +15,23 @@ module GoCLI
     end
   end
 
+  class AuthenticationError < RuntimeError
+    def initialize(msg = nil)
+      message = "ERRNO: #{ERR::AUTHENTICATION_ERROR} - Authentication error"
+      message += ": #{msg}" if msg
+      super(message)
+    end
+  end
+
   module EXT
     SUCCESS = 0
-    INTERRUPT = -1
+    FAILURE = -1
   end
 
   module ERR
     FILE_NOT_FOUND = 1
     BAD_FILE = 2
-    TOO_MANY_ATTEMPTS = 1
-    LOGIN_ERROR = 3
+    TOO_MANY_ATTEMPTS = 3
+    AUTHENTICATION_ERROR = 4
   end
 end
