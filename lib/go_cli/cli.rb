@@ -25,7 +25,7 @@ module GoCLI
           puts "Loading from #{options[:file]}"
           puts "Other settings will be overriden!" if options[:size] || options[:pos]
           @file = options[:file]
-          @app_session = AppSession.load_file(@file)
+          @app_session = AppSession.load_session_file(@file)
           puts CLI::BANNER
           main_menu
         else
