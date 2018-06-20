@@ -3,7 +3,7 @@ module GoCLI
     attr_reader :user
     attr_accessor :xpos, :ypos
 
-    def initialize(username, password, xpos: nil, ypos: nil)
+    def initialize(username, password)
     end
 
     def add_trip(dest_xpos, dest_ypos)

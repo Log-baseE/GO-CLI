@@ -1,8 +1,22 @@
 module GoCLI
   class User
+    USERNAME_PATTERN = /[a-z][a-z0-9_\-]{5,19}/
+    USERNAME_PATTERN_DESCRIPTION = <<~DESC
+      Username must meet the following conditions:
+      - 6-20 characters
+      - All alphabet characters must be in lowercase
+      - Starts with a letter
+      - May only contain alphanumerics, underscore (_) and hyphens(-)
+    DESC
+
     attr_reader :username, :password_digest, :debt
   
     def self.exist?(username)
+      
+    end
+    
+    def self.valid_username?(string)
+      User::PATTERN.match? username
     end
 
     def self.valid?(username, password)

@@ -1,4 +1,6 @@
+require_relative 'lib/go_cli/version'
 require_relative 'lib/go_cli/config'
+require_relative 'lib/go_cli/exit_codes'
 require_relative 'lib/go_cli/world'
 require_relative 'lib/go_cli/user'
 require_relative 'lib/go_cli/driver'
@@ -11,4 +13,5 @@ require 'yaml'
 
 options = {}
 
-GoCLI::CLI.new.start(options)
+main_cli = GoCLI::CLI.new
+main_cli.start(options)
