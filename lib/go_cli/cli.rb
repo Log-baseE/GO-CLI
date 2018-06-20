@@ -11,7 +11,7 @@ module GoCLI
          `Y8bood8P'    `Y8bood8P'           `Y8bood8P'  o888ooooood8 o888o 
       ######################################################################
     
-      >>> Welcome to Go-CLI v#{GoCLI::VERSION}!!!
+      >>> Welcome to Go-CLI v#{VERSION}!!!
     
       #{"="*20}
     BANNER
@@ -45,7 +45,7 @@ module GoCLI
 
     def login
       username = "", password = ""
-      GoCLI::MAX_ATTEMPT.times do
+      Config::MAX_ATTEMPT.times do
         puts "Please enter your username: "
         print CLI::PROMPT
         entry = gets.strip
@@ -59,7 +59,7 @@ module GoCLI
 
       # TODO: check if username is set
 
-      GoCLI::MAX_ATTEMPT.times do
+      Config::MAX_ATTEMPT.times do
         puts "Please enter your password (hidden): "
         print CLI::PROMPT
         entry = STDIN.noecho(&:gets).chomp
@@ -83,11 +83,11 @@ module GoCLI
         case answer
         when "yes" || "y"
           tempuser = ""
-          GoCLI::MAX_ATTEMPT.times do
+          Config::MAX_ATTEMPT.times do
             puts "Please enter your username again [#{username}] (press ENTER to use previous value)"
             print CLI::PROMPT
             entry = gets.strip
-            unless User.valid_username?(entry) do
+            unless User.valid_username?(entry)
               puts User::USERNAME_PATTERN_DESCRIPTION
               tempuser = ""
               next
@@ -97,13 +97,13 @@ module GoCLI
             puts "Username taken, please use another username"
             tempuser = ""
           end
-          close(GoCLI::EXT::TOO_MANY_ATTEMPTS) if tempuser.empty?
+          close(ERR::TOO_MANY_ATTEMPTS) if tempuser.empty?
           username = tempuser
           password = ""
           # TODO: handle password input
           User.signup(username, password)
         when "no" || "n"
-          close(GoCLI::EXT::SUCCESS)
+          close(EXT::SUCCESS)
         else
           puts "Invalid input"
         end
@@ -115,8 +115,8 @@ module GoCLI
       app_session.user_session
     end
 
-    def close(exitcode = GoCLI::EXT::SUCCESS)
-      puts "Thank you for using Go-CLI v#{GoCLI::VERSION}"
+    def close(exitcode = EXT::SUCCESS)
+      puts "Thank you for using Go-CLI v#{VERSION}"
       puts "See you next time"
       exit exitcode
     end

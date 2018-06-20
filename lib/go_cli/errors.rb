@@ -1,7 +1,7 @@
 module GoCLI
   class BadFileError < StandardError
     def initialize(filename=nil)
-      message = "ERRNO: #{GoCLI::ERR::BAD_FILE} - Bad file"
+      message = "ERRNO: #{ERR::BAD_FILE} - Bad file"
       message += ": #{filename}" if filename
       super(message)
     end
@@ -9,7 +9,7 @@ module GoCLI
 
   class FileNotFoundError < IOError
     def initialize(filename=nil)
-      message = "ERRNO: #{GoCLI::ERR::FILE_NOT_FOUND} - File not found"
+      message = "ERRNO: #{ERR::FILE_NOT_FOUND} - File not found"
       message += ": #{filename}" if filename
       super(message)
     end

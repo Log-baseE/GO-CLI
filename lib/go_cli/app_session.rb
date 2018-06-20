@@ -22,8 +22,8 @@ module GoCLI
       end
     end
 
-    def initialize(user_session:, world_size: GoCLI::DEFAULT_WORLD_SIZE, drivers: nil)
-      driver_amount = drivers ? drivers.size : GoCLI::DEFAULT_DRIVER_AMOUNT
+    def initialize(user_session:, world_size: Config::DEFAULT_WORLD_SIZE, drivers: nil)
+      driver_amount = drivers ? drivers.size : Config::DEFAULT_DRIVER_AMOUNT
       min_size = Math.sqrt(driver_amount + 1).ceil
       raise ArgumentError, "World size too small, must be at least #{min_size}" unless world_size >= min_size
       @world = World.new(world_size)

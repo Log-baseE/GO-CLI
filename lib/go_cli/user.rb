@@ -11,21 +11,21 @@ module GoCLI
 
     attr_reader :username, :password_digest, :debt
   
+    def self.generate_filename(username)
+      Config::USER_DATA_DIR + "#{username}.yml"
+    end
+
     def self.exist?(username)
       filename = username + ".yml"
-      Utils.load_file(generate_filename(username)) ? true : false rescue false
+      Utils.load_file(User.generate_filename(username)) ? true : false rescue false
     end
     
     def self.valid_username?(string)
       User::PATTERN.match? username
     end
 
-    def self.generate_filename(username)
-      GoCLI::USER_DATA_DIR + "#{username}.yml"
-    end
-
     def self.valid?(username, password)
-      user = load_user_file(generate_filename(username))
+      user = load_user_file(User.generate_filename(username))
       user.password_digest == Digest::SHA2.hexdigest(password) rescue false
     end
 
@@ -47,9 +47,13 @@ module GoCLI
     end
 
     def initialize(username, password_digest, debt)
+      @username = username
+      @password_digest = password_digest
+      @debt = 0
     end
 
     def add_debt(amount)
+      @debt += amount
     end
 
     private_class_method :generate_filename
