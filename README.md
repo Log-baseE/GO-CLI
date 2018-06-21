@@ -36,6 +36,8 @@ ruby go_cli.rb --file=filename
 ruby go_cli.rb -s 30 --pos=1,1 -f filename
 ```
 
+For easier testing of file load, provided is a file `session.yml` in `data/`
+
 ## Design Decisions
 
 ### Assumptions
