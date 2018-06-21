@@ -54,7 +54,7 @@ module GoCLI
     end
 
     def store
-      puts @filename
+      # puts @filename
       Utils.write_file(self, @filename)
       user_id_map = Utils.load_yml_file(Config::USER_ID_MAPFILE)
       user_id_map[@username] = @user_id

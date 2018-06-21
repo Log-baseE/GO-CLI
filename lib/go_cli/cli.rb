@@ -48,7 +48,10 @@ module GoCLI
           puts "Loading from #{options[:file]}"
           puts "Other settings will be overriden!" if options[:size] || options[:pos]
           @file = options[:file]
-          @app_session = AppSession.load_session_file(@file)
+          user_session = login
+          @app_session = AppSession.load_session_file(@file, user_session)
+          puts "Load successful!"
+          system "pause"
           main_menu
         else
           user_session = login
@@ -56,20 +59,14 @@ module GoCLI
           user_xpos = options[:pos] && options[:pos][0] ? options[:pos][0] : rand(1..world_size)
           user_ypos = options[:pos] && options[:pos][1] ? options[:pos][1] : rand(1..world_size)
           user_session.xpos, user_session.ypos = user_xpos, user_ypos
-          positions = [[user_xpos, user_ypos]]
-          driver_id_list = Driver.random_sample(Config::DEFAULT_DRIVER_AMOUNT)
-          positions << [rand(1..world_size), rand(1..world_size)] while positions.uniq.size < Config::DEFAULT_DRIVER_AMOUNT + 1
-          positions.uniq!
-          positions.shift
-          driver_sessions = driver_id_list.map.with_index { |driver_id, index| DriverSession.new(driver_id, *positions[index]) }
-          @app_session = AppSession.new(user_session, world_size, driver_sessions)
+          @app_session = AppSession.new(user_session, world_size)
+          main_menu
         end
       rescue => e
         puts "Error at initialization:"
         puts e.message
-        puts e.backtrace
+        # puts e.backtrace
       end
-      main_menu
     end
 
     def main_menu
@@ -182,9 +179,14 @@ module GoCLI
 
           temp_pass = ""
           Config::MAX_ATTEMPT.times do
-            puts "Please enter your password (hidden): "
+            puts "Please enter your password (hidden, min 4 characters): "
             print CLI::PROMPT
             temp_pass = STDIN.noecho(&:gets).chomp
+            unless temp_pass.size >= 4
+              puts "\nPassword length must be at least 4 characters" 
+              temp_pass = ""
+              next
+            end
             puts "\nPlease confirm your password (hidden): "
             print CLI::PROMPT
             confirm_entry = STDIN.noecho(&:gets).chomp
@@ -222,8 +224,8 @@ module GoCLI
       dest = []
       system "cls"
       puts CLI::ORDER_RIDE_BANNER
+      puts "You are now in (#{user_session.xpos}, #{user_session.ypos})"
       loop do
-        puts "You are now in (#{user_session.xpos}, #{user_session.ypos})"
         puts "Please enter your destination [x y] (enter nothing to cancel)"
         puts "Invalid input!" if error
         print CLI::PROMPT
@@ -248,6 +250,9 @@ module GoCLI
       puts "Distance from you : #{min_distance} units"
       puts @app_session.draw_route(min_driver.xpos, min_driver.ypos, temp_trip.route)
       puts ""
+      puts "Total distance\t: #{temp_trip.route.distance}"
+      puts "Estimated price\t: #{temp_trip.price}"
+      puts ""
       loop do
         puts "Confirm ride? [y]es/[n]o"
         puts "Invalid input!" if error
@@ -257,15 +262,16 @@ module GoCLI
         when /y(es)?/
           error = false
           puts "Ride confirmed"
-          user_session.do_trip(temp_trip)
+          app_session.do_trip(temp_trip)
           loop do
             puts "Please input a valid rating!" if error
             puts "Please rate your ride (1-5)"
             print CLI::PROMPT
             entry = gets.strip.to_i
-            puts entry
             if Trip.valid_rating?(entry)
               error = false
+              puts "Thank you for your feedback!"
+              puts ""
               temp_trip.rate(entry)
               break
             else
@@ -276,7 +282,10 @@ module GoCLI
         when /n(o)?/
           error = false
           puts "Ride cancelled"
+          puts ""
           break
+        else
+          error = true
         end
       end
       system "pause"
@@ -322,7 +331,12 @@ module GoCLI
       puts "ERRCODE: #{exitcode}" unless exitcode == EXT::SUCCESS
       puts "Thank you for using Go-CLI v#{VERSION}"
       puts "See you next time"
+      # save_session("data/session.yml")
       exit exitcode
+    end
+
+    def save_session(filename)
+      @app_session.store(filename)
     end
   end
 end

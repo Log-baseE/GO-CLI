@@ -9,23 +9,37 @@ module GoCLI
   class AppSession
     attr_reader :world, :user_session, :driver_sessions
 
-    def self.load_session_file(filename)
+    def self.load_session_file(filename, user_session)
       app_session = Utils.load_file(filename)
       begin
-        AppSession.new(
-          user_session: app_session.user_session,
-          world_size: app_session.world.size,
-          driver_sessions: app_session.driver_sessions
-        )
-      rescue
+        loaded_user_session = app_session.user_session
+        user_session.xpos = loaded_user_session.xpos
+        user_session.ypos = loaded_user_session.ypos
+        driver_sessions = app_session.driver_sessions.map { |ds| DriverSession.new(ds.driver_id, ds.xpos, ds.ypos) }
+        AppSession.new(user_session, app_session.world.size, driver_sessions)
+      rescue 
         raise BadFileError, filename
       end
     end
 
-    def initialize(user_session, world_size, driver_sessions)
+    def initialize(user_session, world_size, driver_sessions = nil)
       @user_session = user_session
-      @driver_sessions = driver_sessions
+      driver_amount = driver_sessions ? driver_sessions.size : Config::DEFAULT_DRIVER_AMOUNT
+      min_size = Math.sqrt(driver_amount + 1).ceil
+      raise ArgumentError, "World size too small, must be at least #{min_size}" unless world_size >= min_size
+      @driver_sessions = 
+        if driver_sessions
+          driver_sessions
+        else
+          positions = [[user_session.xpos, user_session.ypos]]
+          driver_id_list = Driver.random_sample(Config::DEFAULT_DRIVER_AMOUNT)
+          positions << [rand(1..world_size), rand(1..world_size)] while positions.uniq.size < Config::DEFAULT_DRIVER_AMOUNT + 1
+          positions.uniq!
+          positions.shift
+          driver_sessions = driver_id_list.map.with_index { |driver_id, index| DriverSession.new(driver_id, *positions[index]) }
+        end
       @world = World.new(world_size)
+      raise ArgumentError, "Invalid coordinates" unless @world.valid_coordinate?(user_session.xpos, user_session.ypos) && driver_sessions.all? { |ds| @world.valid_coordinate?(ds.xpos, ds.ypos) }
     end
 
     def empty_map_matrix
@@ -35,7 +49,6 @@ module GoCLI
     end
 
     def draw_world
-      banner = "-"*32 + " MAP " + "-"*32
       map = empty_map_matrix
       map[user_session.ypos][user_session.xpos] = Config::MAP_USER_CHAR
       driver_sessions.each { |ds| map[ds.ypos][ds.xpos] = Config::MAP_DRIVER_CHAR }
@@ -45,7 +58,7 @@ module GoCLI
       #{Config::MAP_USER_CHAR}: you!
       #{Config::MAP_DRIVER_CHAR}: driver
       LEGEND
-      [banner, map, legend].join("\n")
+      [map, legend].join("\n")
     end
 
     def get_closest_driver
@@ -125,10 +138,14 @@ module GoCLI
       LEGEND
       [banner, map, legend].join("\n")
     end
+    def do_trip(trip)
+      trip.store
+      user_session.do_trip(trip)
+    end
+  
+    def store(filename)
+      Utils.write_file(self, filename)
+    end
   end
 
-  def do_trip(trip)
-    trip.store
-    user_session.do_trip(trip)
-  end
 end
