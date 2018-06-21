@@ -54,6 +54,7 @@ module GoCLI
     end
 
     def store
+      puts @filename
       Utils.write_file(self, @filename)
       user_id_map = Utils.load_yml_file(Config::USER_ID_MAPFILE)
       user_id_map[@username] = @user_id
@@ -76,7 +77,7 @@ module GoCLI
       @username = username
       @filename = filename
       @password_digest = password_digest
-      @debt = 0
+      @debt = debt
     end
 
     def add_debt(amount)

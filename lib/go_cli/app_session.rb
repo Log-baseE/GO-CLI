@@ -64,7 +64,39 @@ module GoCLI
 
     def get_trip_details(index)
       trip = load_trips[index]
-      YAML.dump(trip)
+      details = <<~DETAIL
+        TRIP DETAILS (#{trip.date.strftime("%d %b %Y (%H:%M)")}
+
+        From\t\t: #{trip.start_xpos}, #{trip.start_ypos}
+        Destination\t: #{trip.end_xpos}, #{trip.end_ypos}
+        Distance\t: #{trip.route.distance}
+        Price\t\t: #{trip.price}
+        Driver\t\t: #{Driver.load_data(trip.driver_id).name}
+        Rating\t\t: #{trip.rating}
+        Route taken\t:
+      DETAIL
+      map = empty_map_matrix
+      trip.route.each_cons(2) do |node1, node2|
+        if node2[1] == node1[1]
+          ([node1[0], node2[0]].min..[node1[0], node2[0]].max).each do |x|
+            map[node1[1]][x] = Config::MAP_ROUTE_CHAR
+          end
+        elsif node2[0] == node1[0]
+          ([node1[1], node2[1]].min..[node1[1], node2[1]].max).each do |y|
+            map[y][node1[0]] = Config::MAP_ROUTE_CHAR
+          end
+        end
+      end
+      map[trip.start_ypos][trip.start_xpos] = Config::MAP_USER_CHAR
+      map[trip.end_ypos][trip.end_xpos] = Config::MAP_DESTINATION_CHAR
+      # map.join("\n")
+      legend = <<~LEGEND
+        Legend:
+        #{Config::MAP_USER_CHAR}: you!
+        #{Config::MAP_DESTINATION_CHAR}: destination
+        #{Config::MAP_ROUTE_CHAR}: route
+      LEGEND
+      [details, map, legend].join("\n")
     end
 
     def draw_route(driver_xpos, driver_ypos, route)
@@ -84,7 +116,6 @@ module GoCLI
       map[driver_ypos][driver_xpos] = Config::MAP_DRIVER_CHAR
       map[@user_session.ypos][@user_session.xpos] = Config::MAP_USER_CHAR
       map[route.end_pos[1]][route.end_pos[0]] = Config::MAP_DESTINATION_CHAR
-      map.join("\n")
       legend = <<~LEGEND
         Legend:
         #{Config::MAP_USER_CHAR}: you!

@@ -19,8 +19,8 @@ require 'io/console'
 require 'base64'
 
 def reset
-  File.write(GoCLI::Config::USER_FILE_MAPFILE, "--- {}\n")
-  File.write(GoCLI::Config::USER_ID_MAPFILE, "--- {}\n")
+  # File.write(GoCLI::Config::USER_FILE_MAPFILE, "--- {}\n")
+  # File.write(GoCLI::Config::USER_ID_MAPFILE, "--- {}\n")
   # File.write(GoCLI::Config::DRIVER_ID_MAPFILE, "--- []\n")
   # File.write(GoCLI::Config::DRIVER_FILE_MAPFILE, "--- {}\n")
   File.write(GoCLI::Config::TRIP_DRIVER_MAPFILE, "--- {}\n")

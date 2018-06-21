@@ -223,7 +223,8 @@ module GoCLI
       system "cls"
       puts CLI::ORDER_RIDE_BANNER
       loop do
-        puts "Please enter your destination [x y]"
+        puts "You are now in (#{user_session.xpos}, #{user_session.ypos})"
+        puts "Please enter your destination [x y] (enter nothing to cancel)"
         puts "Invalid input!" if error
         print CLI::PROMPT
         entry = gets.strip.split(/[, ]+/).map(&:to_i)
@@ -231,6 +232,9 @@ module GoCLI
           error = false
           dest = entry
           break
+        elsif entry.empty?
+          error = false
+          return
         else
           error = true
         end
@@ -255,8 +259,8 @@ module GoCLI
           puts "Ride confirmed"
           user_session.do_trip(temp_trip)
           loop do
-            puts "Please rate your ride (1-5)"
             puts "Please input a valid rating!" if error
+            puts "Please rate your ride (1-5)"
             print CLI::PROMPT
             entry = gets.strip.to_i
             if Trip.valid_rating?(entry)
@@ -278,9 +282,35 @@ module GoCLI
     end
 
     def view_trip_history
-      system "cls"
-      puts CLI::VIEW_TRIPS_BANNER
-      puts 
+      error = false
+      loop do
+        system "cls"
+        puts CLI::VIEW_TRIPS_BANNER
+        descriptions =  @app_session.get_trip_descriptions
+        puts descriptions.join("\n")
+        puts "\n0) Go Back"
+        puts ""
+        puts "Invalid input!" if error
+        puts "Enter trip number to view details. Press 0 to go back"
+        print CLI::PROMPT
+        choice = gets.strip
+        choice = -1 unless /\d+/.match? choice
+        choice = choice.to_i
+        case choice
+        when 0
+          error = false
+          break
+        when (1..descriptions.size)
+          error = false
+          system "cls"
+          puts CLI::VIEW_TRIPS_BANNER
+          puts @app_session.get_trip_details(choice-1)
+          puts ""
+          system "pause"
+        else
+          error = true
+        end
+      end
     end
 
     def user_session
