@@ -41,7 +41,7 @@ module GoCLI
     attr_reader :app_session
 
     def start(options)
-      system "cls"
+      system "clear" or system "cls"
       puts CLI::BANNER
       begin
         if options[:file]
@@ -50,7 +50,7 @@ module GoCLI
           @file = options[:file]
           user_session = login
           @app_session = AppSession.load_session_file(@file, user_session)
-          puts "Load successful!"
+          puts "\nLoad successful!"
           system "pause"
           main_menu
         else
@@ -72,7 +72,7 @@ module GoCLI
     def main_menu
       error = false
       loop do
-        system "cls"
+        system "clear" or system "cls"
         puts CLI::MAIN_MENU_BANNER
         puts <<~MAIN
           Hello #{user_session.username}, you are currently in (#{user_session.xpos}, #{user_session.ypos})
@@ -113,7 +113,7 @@ module GoCLI
     end
 
     def login
-      system "cls"
+      system "clear" or system "cls"
       puts CLI::LOGIN_BANNER
       username = ""
       password = ""
@@ -150,7 +150,7 @@ module GoCLI
     end
 
     def signup(username)
-      system "cls"
+      system "clear" or system "cls"
       puts CLI::SIGNUP_BANNER
       puts "Hello #{username}, we don't think you have signed up yet."
       loop do
@@ -207,12 +207,12 @@ module GoCLI
           puts "Invalid input"
         end
       end
-      system "cls"
+      system "clear" or system "cls"
       username
     end
 
     def display_map
-      system "cls"
+      system "clear" or system "cls"
       puts CLI::VIEW_MAP_BANNER
       puts @app_session.draw_world
       puts ""
@@ -222,7 +222,7 @@ module GoCLI
     def order_ride
       error = false
       dest = []
-      system "cls"
+      system "clear" or system "cls"
       puts CLI::ORDER_RIDE_BANNER
       puts "You are now in (#{user_session.xpos}, #{user_session.ypos})"
       loop do
@@ -294,7 +294,7 @@ module GoCLI
     def view_trip_history
       error = false
       loop do
-        system "cls"
+        system "clear" or system "cls"
         puts CLI::VIEW_TRIPS_BANNER
         descriptions =  @app_session.get_trip_descriptions
         puts descriptions.join("\n")
@@ -312,7 +312,7 @@ module GoCLI
           break
         when (1..descriptions.size)
           error = false
-          system "cls"
+          system "clear" or system "cls"
           puts CLI::VIEW_TRIPS_BANNER
           puts @app_session.get_trip_details(choice-1)
           puts ""
