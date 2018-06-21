@@ -15,5 +15,10 @@ module GoCLI
     DRIVER_DATA_DIR = "data/drivers/"
     DRIVER_ID_MAPFILE = DRIVER_DATA_DIR + "driver_id_map.yml"
     DRIVER_FILE_MAPFILE = DRIVER_DATA_DIR + "driver_file_map.yml"
+    MAP_USER_CHAR = "U"
+    MAP_DRIVER_CHAR = "D"
+    MAP_EMPTY_CHAR = "·"
+    MAP_DESTINATION_CHAR = "X"
+    MAP_ROUTE_CHAR = "■"
   end
 end

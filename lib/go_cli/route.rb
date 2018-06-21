@@ -6,10 +6,10 @@ module GoCLI
     
     attr_reader :route
     
-    def_delegators :@route, :size, :length, :each, :select, :[]
+    def_delegators :@route, :size, :length, :each, :select, :[], :each_cons
 
     def self.generate(start_xpos, start_ypos, end_xpos, end_ypos)
-      Route.new([start_xpos, start_ypos], [end_xpos, end_ypos])
+      Route.new([start_xpos, start_ypos], [start_xpos, end_ypos], [end_xpos, end_ypos])
     end
     
     def initialize(startpos, nextpos, *nodes)
@@ -24,12 +24,18 @@ module GoCLI
 
     def distance
       result = 0
-      prev = @route[0]
-      @route[1..@route.size].each do |node|
-        result += (node[0] - prev[0]).abs + (node[1] - prev[1]).abs
-        prev = node
+      @route.each_cons(2) do |node1, node2|
+        result += (node2[0] - node1[0]).abs + (node2[1] - node1[1]).abs
       end
       result
+    end
+
+    def start_pos
+      @route[0]
+    end
+
+    def end_pos
+      @route[-1]
     end
   end
 end

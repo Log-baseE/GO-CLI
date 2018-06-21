@@ -21,8 +21,8 @@ module GoCLI
     end
 
     def self.exist?(username)
-      user_file_map = Utils.load_yml_file(Config::USER_FILE_MAPFILE)
-      user_file_map[username] ? true : false rescue false
+      user_id_map = Utils.load_yml_file(Config::USER_ID_MAPFILE)
+      user_id_map[username] ? true : false rescue false
     end
     
     def self.valid_username?(string)
@@ -37,8 +37,10 @@ module GoCLI
 
     def self.load_data(username, password)
       return nil unless User.valid?(username, password)
+      user_id_map = Utils.load_yml_file(Config::USER_ID_MAPFILE)
+      user_id = user_id_map[username]
       user_file_map = Utils.load_yml_file(Config::USER_FILE_MAPFILE)
-      filename = user_file_map[username]
+      filename = user_file_map[user_id]
       User.load_user_file(filename)
     end
 
@@ -51,19 +53,22 @@ module GoCLI
       end
     end
 
+    def store
+      Utils.write_file(self, @filename)
+      user_id_map = Utils.load_yml_file(Config::USER_ID_MAPFILE)
+      user_id_map[@username] = @user_id
+      Utils.write_yml_file(user_id_map, Config::USER_ID_MAPFILE)
+      user_file_map = Utils.load_yml_file(Config::USER_FILE_MAPFILE)
+      user_file_map[@user_id] = @filename
+      Utils.write_yml_file(user_file_map, Config::USER_FILE_MAPFILE)
+      self
+    end
+
     def self.signup(username, password)
       user_id = User.generate_id(username)
       filename = User.generate_filename(username)
       user = User.new(user_id, username, filename, Digest::SHA2.hexdigest(password), 0)
-
-      Utils.write_file(user, filename)
-      user_id_map = Utils.load_yml_file(Config::USER_ID_MAPFILE)
-      user_id_map[username] = user_id
-      Utils.write_yml_file(user_id_map, Config::USER_ID_MAPFILE)
-      user_file_map = Utils.load_yml_file(Config::USER_FILE_MAPFILE)
-      user_file_map[username] = filename
-      Utils.write_yml_file(user_file_map, Config::USER_FILE_MAPFILE)
-      user
+      user.store
     end
 
     def initialize(user_id, username, filename, password_digest, debt)
@@ -76,6 +81,7 @@ module GoCLI
 
     def add_debt(amount)
       @debt += amount
+      store
     end
 
     def to_s

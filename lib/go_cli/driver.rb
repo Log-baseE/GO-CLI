@@ -17,22 +17,33 @@ module GoCLI
       driver = Driver.new(driver_id, name, license_plate, Config::MAX_RATING)
 
       Utils.write_file(driver, filename)
-      driver_id_map = Utils.load_yml_file(Config::USER_ID_MAPFILE)
+      driver_id_map = Utils.load_yml_file(Config::DRIVER_ID_MAPFILE)
       driver_id_map << driver_id
-      Utils.write_yml_file(driver_id_map, Config::USER_ID_MAPFILE)
-      driver_file_map = Utils.load_yml_file(Config::USER_FILE_MAPFILE)
-      driver_file_map << filename
-      Utils.write_yml_file(driver_file_map, Config::USER_FILE_MAPFILE)
+      Utils.write_yml_file(driver_id_map, Config::DRIVER_ID_MAPFILE)
+      driver_file_map = Utils.load_yml_file(Config::DRIVER_FILE_MAPFILE)
+      driver_file_map[driver_id] = filename
+      Utils.write_yml_file(driver_file_map, Config::DRIVER_FILE_MAPFILE)
       driver
     end
 
-    def self.load_file(filename)
+    def self.load_data(driver_id)
+      driver_file_map = Utils.load_yml_file(Config::DRIVER_FILE_MAPFILE)
+      filename = driver_file_map[driver_id]
+      Driver.load_driver_file(filename)
+    end
+
+    def self.load_driver_file(filename)
       driver = Utils.load_file(filename)
       begin
         Driver.new(driver.driver_id, driver.name, driver.license_plate, driver.rating)
       rescue
         raise BadFileError, filename
       end
+    end
+
+    def self.random_sample(amount)
+      driver_id_list = Utils.load_yml_file(Config::DRIVER_ID_MAPFILE)
+      driver_id_list.sample(amount)
     end
 
     def initialize(driver_id, name, license_plate, rating)
