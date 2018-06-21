@@ -126,4 +126,9 @@ module GoCLI
       [banner, map, legend].join("\n")
     end
   end
+
+  def do_trip(trip)
+    trip.store
+    user_session.do_trip(trip)
+  end
 end

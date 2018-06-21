@@ -21,13 +21,24 @@ require 'base64'
 def reset
   # File.write(GoCLI::Config::USER_FILE_MAPFILE, "--- {}\n")
   # File.write(GoCLI::Config::USER_ID_MAPFILE, "--- {}\n")
-  # File.write(GoCLI::Config::DRIVER_ID_MAPFILE, "--- []\n")
-  # File.write(GoCLI::Config::DRIVER_FILE_MAPFILE, "--- {}\n")
+  File.write(GoCLI::Config::DRIVER_ID_MAPFILE, "--- []\n")
+  File.write(GoCLI::Config::DRIVER_FILE_MAPFILE, "--- {}\n")
+  # GoCLI::Driver.create("Sudirman Bima Cahyadi","FAX 4438")
+  # GoCLI::Driver.create("Dwi Eka Oesman","WEE 1935")
+  # GoCLI::Driver.create("Gunadi Shan","KKI 4222")
+  # GoCLI::Driver.create("Sugondo Lei","GAP 8485")
+  # GoCLI::Driver.create("Ward Cresbon","SOB 1258")
+  # GoCLI::Driver.create("Eli Rambe","LLL 1463")
+  # GoCLI::Driver.create("Lemuel Masaro","GUM 3007")
+  # GoCLI::Driver.create("Lemuel Namohaji","OWW 0440")
+  # GoCLI::Driver.create("Sutikno","SAT 6676")
+  # GoCLI::Driver.create("Kuwat","BOI 0151")
   File.write(GoCLI::Config::TRIP_DRIVER_MAPFILE, "--- {}\n")
   File.write(GoCLI::Config::TRIP_USER_MAPFILE, "--- {}\n")
 end
 
 options = {}
 # reset
+
 main_cli = GoCLI::CLI.new
 main_cli.start(options)

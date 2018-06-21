@@ -86,6 +86,11 @@ module GoCLI
       raise ArgumentError, "Bad rating! (must be #{Config::MIN_RATING}-#{Config::MAX_RATING})" unless Trip.valid_rating?(rating)
       @rating = rating
       store
+      trip_ratings = Trip.get_by_driver(@driver_id).sort_by { |trip| trip.date }[0...Config::DRIVER_RATING_LOOKBACK].map { |trip| trip.rating }
+      driver_rating_total = trip_ratings.reduce(:+).to_f
+      driver = Driver.load_data(@driver_id)
+      driver_rating = (driver.rating + driver_rating_total) / (trip_ratings.size + 1)
+      driver.update_rating(driver_rating)
     end
 
     def description

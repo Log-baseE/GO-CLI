@@ -20,5 +20,6 @@ module GoCLI
     MAP_EMPTY_CHAR = "·"
     MAP_DESTINATION_CHAR = "X"
     MAP_ROUTE_CHAR = "■"
+    DRIVER_RATING_LOOKBACK = 5
   end
 end

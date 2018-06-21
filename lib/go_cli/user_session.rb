@@ -10,7 +10,6 @@ module GoCLI
     end
 
     def do_trip(trip)
-      trip.store
       @user.add_debt(trip.price)
       @xpos, @ypos = trip.end_xpos, trip.end_ypos
     end

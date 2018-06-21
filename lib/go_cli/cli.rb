@@ -263,6 +263,7 @@ module GoCLI
             puts "Please rate your ride (1-5)"
             print CLI::PROMPT
             entry = gets.strip.to_i
+            puts entry
             if Trip.valid_rating?(entry)
               error = false
               temp_trip.rate(entry)
