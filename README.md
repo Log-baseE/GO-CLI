@@ -36,13 +36,13 @@ ruby go_cli.rb --file=filename
 ruby go_cli.rb -s 30 --pos=1,1 -f filename
 ```
 
-For easier testing of file load, provided is a file `session.yml` in `data/`
+For easier testing of file loading, a file named `session.yml` is provided in `data/`
 
 ## Design Decisions
 
 ### Assumptions
 
-- The world will always be a square grid of size _n_. Each cell is a space an entity can occupy, with the coordinates `i, j (1 <= i,j <= n)`. Below is an illustration of the world's coordinate space.
+- The world will always be a square grid of size _n_. Each cell is a space in which an entity can occupy, with the coordinates `i, j (1 <= i,j <= n)`. Below is an illustration of the world's coordinate space.
 
   ```ruby
   [1,1][2,1][3,1][4,1]
@@ -94,9 +94,9 @@ _**UC-3 => View trip history**_
 3. User selects a trip
 4. System displays its details
 
-For all the activities above, the user must be logged in. This is to ensure that any activities are encapsulated for each user.
+All of the use cases listed above requires the user being logged in. This is to ensure encapsulation of activities for each user.
 
-All data are stored in a YAML file. This is preferred since ruby can load them easily without additional gem installations. Existing files are structured as makeshift database, to aid important queries and updates.
+All data are stored in a YAML file. This is preferred since ruby can load them easily without additional gem installations. Existing files are structured as a makeshift database, to aid important queries and updates.
 
 ### Configurations
 
@@ -128,11 +128,11 @@ The app lives inside the module `GoCLI`. Inside it are classes as the following:
 | `UserSession`   | Mainly acts as an interface with an instance of `User`. Its instance contains information about the user's position                            |
 | `Driver`        | Similar to `User`, instances of `Driver` temporarily stores data for the app. Class methods are used in a similar way as `User`                |
 | `DriverSession` | Similar to `UserSession`, this class stores the position of the driver, and acts as an interface with a `Driver`                               |
-| `AppSession`    | This class acts as the interface for `UserSession` and `DriverSession`. Most of controls are called through here.                              |
+| `AppSession`    | This class acts as the interface for `UserSession` and `DriverSession`. Most of the controls are called through here.                              |
 | `Route`         | Stores coordinates as nodes in a path, e.g. `[1,2] => [4,5] => [1,4]`.                                                                         |
 | `Trip`          | Instances store crucial details about a trip. Details include user, driver, price, starting position, destination, route, and price.           |
 | `World`         | Contains information about the world size                                                                                                      |
-| `CLI`           | The main command-line interface that the user interacts with. Running `go_cli.rb` will always an instance of `CLI`, with options if any        |
+| `CLI`           | The main command-line interface that the user interacts with. Running `go_cli.rb` will always create an instance of `CLI`, with options if any        |
 
 The `GoCLI` module also contains the following submodules:
 | Submodule | Description                                |
